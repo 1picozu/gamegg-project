@@ -2,6 +2,20 @@ import { useState } from 'react';
 import { useApp } from '../store/AppContext';
 import { GAME_BADGE_CLASS, TIER_CLASS } from '../mockData';
 
+const GAME_ACCOUNT_LABELS = {
+  riot:     { name:'라이엇', icon:'⚡', color:'#c8a84b' },
+  blizzard: { name:'블리자드', icon:'💙', color:'#00aeff' },
+  steam:    { name:'스팀', icon:'🟦', color:'#4a9eff' },
+  nexon:    { name:'넥슨', icon:'🟢', color:'#00d68f' },
+  nc:       { name:'엔씨', icon:'🔴', color:'#ff4757' },
+  kakao:    { name:'카카오', icon:'🟡', color:'#f5a623' },
+};
+
+function loadGameAccounts(userId) {
+  try { return JSON.parse(localStorage.getItem(`gamegg_accounts_${userId}`) || '{}'); }
+  catch { return {}; }
+}
+
 function timeAgo(iso) {
   const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
   if (diff < 60)    return `${diff}초 전`;
@@ -91,7 +105,7 @@ export default function PostDetail() {
         )}
 
         {/* 참가 버튼 */}
-        <div style={{ display:'flex', gap:10, marginBottom:28 }}>
+        <div style={{ display:'flex', gap:10, marginBottom:20 }}>
           {hasJoined ? (
             <>
               <div style={{ flex:1, padding:'13px', borderRadius:10, background:'rgba(0,214,143,0.1)', border:'1px solid rgba(0,214,143,0.35)', color:'#00d68f', fontSize:15, fontWeight:700, textAlign:'center', fontFamily:'Noto Sans KR' }}>
@@ -109,6 +123,41 @@ export default function PostDetail() {
           )}
           <button onClick={()=>navigate(backPage)} style={{ padding:'13px 20px', background:'transparent', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, color:'#8a8fa8', fontSize:14, cursor:'pointer', fontFamily:'Noto Sans KR' }}>목록으로</button>
         </div>
+
+        {/* 내 게임 닉네임 표시 (참가 완료 시) */}
+        {hasJoined && user && (() => {
+          const accts = loadGameAccounts(user.id);
+          const filledAccts = Object.entries(accts).filter(([,v])=>v&&v.trim());
+          return (
+            <div style={{ marginBottom:20, padding:'14px 16px', background:'rgba(74,158,255,0.06)', border:'1px solid rgba(74,158,255,0.2)', borderRadius:10 }}>
+              <div style={{ fontSize:13, fontWeight:700, color:'#4a9eff', marginBottom:10, fontFamily:'Noto Sans KR' }}>
+                🎮 내 게임 닉네임 (상대방에게 표시됨)
+              </div>
+              {filledAccts.length > 0 ? (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                  {filledAccts.map(([id, nick]) => {
+                    const info = GAME_ACCOUNT_LABELS[id];
+                    if (!info) return null;
+                    return (
+                      <div key={id} style={{ display:'flex', alignItems:'center', gap:6, padding:'6px 12px', background:info.color+'18', border:`1px solid ${info.color}44`, borderRadius:8, fontSize:12, fontFamily:'Noto Sans KR' }}>
+                        <span>{info.icon}</span>
+                        <span style={{ color:'#8a8fa8' }}>{info.name}</span>
+                        <span style={{ color:'#e2e4ed', fontWeight:700 }}>{nick}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ fontSize:12, color:'#5a5f78', fontFamily:'Noto Sans KR' }}>
+                  게임 닉네임이 등록되지 않았어요.{' '}
+                  <button onClick={()=>navigate('mypage')} style={{ background:'none', border:'none', color:'#4a9eff', cursor:'pointer', fontSize:12, padding:0, textDecoration:'underline', fontFamily:'Noto Sans KR' }}>
+                    마이페이지에서 등록하기 →
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* 댓글 */}
         <div>

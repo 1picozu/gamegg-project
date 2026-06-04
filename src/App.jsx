@@ -13,6 +13,7 @@ import FriendsPage  from './pages/FriendsPage';
 import ScrimPage    from './pages/ScrimPage';
 import BalancerPage from './pages/BalancerPage';
 import BoardPage    from './pages/BoardPage';
+import MyPage       from './pages/MyPage';
 
 function HomePage() {
   return (
@@ -53,6 +54,7 @@ function Router() {
     case 'post-detail': return <PostDetail />;
     case 'create-post': return <CreatePost />;
     case 'login':       return <LoginPage />;
+    case 'mypage':      return <MyPage />;
     default:            return <HomePage />;
   }
 }

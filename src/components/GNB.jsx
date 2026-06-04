@@ -22,7 +22,6 @@ export default function GNB({ darkMode, toggleDark }) {
     return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  // 외부 클릭 시 유저 메뉴 닫기
   useEffect(() => {
     if (!showUserMenu) return;
     const fn = () => setShowUserMenu(false);
@@ -64,11 +63,23 @@ export default function GNB({ darkMode, toggleDark }) {
                 {user.nickname}
               </button>
               {showUserMenu && (
-                <div style={{ position:'absolute', top:42, right:0, background:'#1e2130', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:6, minWidth:130, zIndex:999, boxShadow:'0 8px 24px rgba(0,0,0,0.5)' }}>
-                  <button onClick={()=>{logout();setShowUserMenu(false);}} style={{ width:'100%', textAlign:'left', padding:'8px 12px', background:'transparent', border:'none', color:'#ff4757', fontSize:13, cursor:'pointer', borderRadius:6, fontFamily:'Noto Sans KR' }}
+                <div style={{ position:'absolute', top:42, right:0, background:'#1e2130', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:6, minWidth:150, zIndex:999, boxShadow:'0 8px 24px rgba(0,0,0,0.5)' }}>
+                  {/* 마이페이지 버튼 */}
+                  <button onClick={()=>{ navigate('mypage'); setShowUserMenu(false); }}
+                    style={{ width:'100%', textAlign:'left', padding:'8px 12px', background:'transparent', border:'none', color:'#c8cce0', fontSize:13, cursor:'pointer', borderRadius:6, fontFamily:'Noto Sans KR', display:'flex', alignItems:'center', gap:8 }}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(74,158,255,0.1)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}
+                  >
+                    👤 마이페이지
+                  </button>
+                  <div style={{ height:1, background:'rgba(255,255,255,0.06)', margin:'4px 6px' }} />
+                  <button onClick={()=>{ logout(); setShowUserMenu(false); }}
+                    style={{ width:'100%', textAlign:'left', padding:'8px 12px', background:'transparent', border:'none', color:'#ff4757', fontSize:13, cursor:'pointer', borderRadius:6, fontFamily:'Noto Sans KR', display:'flex', alignItems:'center', gap:8 }}
                     onMouseEnter={e=>e.currentTarget.style.background='rgba(255,71,87,0.1)'}
                     onMouseLeave={e=>e.currentTarget.style.background='transparent'}
-                  >로그아웃</button>
+                  >
+                    🚪 로그아웃
+                  </button>
                 </div>
               )}
             </div>
