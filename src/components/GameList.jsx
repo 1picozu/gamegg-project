@@ -409,30 +409,31 @@ function useSentinel(cb, enabled) {
 }
 
 export default function GameList({ fullPage=false }) {
-  const { games, loading, loadingMore, offline, hasMore, loadMore, totalCount } = useRawgGames();
-  const sentinelRef = useSentinel(loadMore, hasMore && !loadingMore && !loading && fullPage);
+  const { games, loading, loadingMore, offline, totalCount, loadedCount, done } = useRawgGames();
 
-  const [aiResults,  setAiResults]  = useState(null);
-  const [aiQuery,    setAiQuery]    = useState('');
-  const [category,   setCategory]   = useState('all');
+  const [aiResults, setAiResults] = useState(null);
+  const [aiQuery,   setAiQuery]   = useState('');
+  const [category,  setCategory]  = useState('all');
 
-  const displayAll = fullPage ? games : games.slice(0, 10);
+  // 전체 게임 풀 — 홈에서는 앞 10개만
+  const pool = fullPage ? games : games.slice(0, 10);
 
-  // 카테고리 필터 적용
-  const categoryFiltered = category === 'all'
-    ? displayAll
-    : displayAll.filter(CATEGORIES.find(c=>c.id===category)?.filter || (()=>true));
+  // 카테고리 필터 (전체 로드된 pool에서 즉시 필터)
+  const catFilter = CATEGORIES.find(c => c.id === category)?.filter ?? (() => true);
+  const categoryFiltered = category === 'all' ? pool : pool.filter(catFilter);
 
-  // AI 결과가 있으면 AI 결과에서 카테고리 필터 적용
+  // AI 결과 우선, 그 위에 카테고리 필터
   const displayGames = aiResults !== null
-    ? (category === 'all' ? aiResults : aiResults.filter(CATEGORIES.find(c=>c.id===category)?.filter || (()=>true)))
+    ? (category === 'all' ? aiResults : aiResults.filter(catFilter))
     : categoryFiltered;
 
-  // 카테고리별 게임 수 계산
+  // 카테고리 뱃지 수 — pool 전체 기준
   const gameCounts = {};
   CATEGORIES.forEach(cat => {
-    gameCounts[cat.id] = cat.id === 'all' ? displayAll.length : displayAll.filter(cat.filter).length;
+    gameCounts[cat.id] = cat.id === 'all' ? pool.length : pool.filter(cat.filter).length;
   });
+
+  const progressPct = loadedCount > 0 ? Math.min(Math.round((loadedCount / 1000) * 100), 100) : 0;
 
   return (
     <>
@@ -440,15 +441,34 @@ export default function GameList({ fullPage=false }) {
 
       <div className="card p-5 mb-8">
         {/* 헤더 */}
-        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
           <span className="section-title">{fullPage ? '전체 게임 목록' : '이달의 인기 게임'}</span>
           {offline
             ? <span style={{ fontSize:11, background:'rgba(245,166,35,0.12)', color:'#f5a623', border:'1px solid rgba(245,166,35,0.3)', padding:'2px 8px', borderRadius:999 }}>오프라인 모드</span>
             : <span style={{ fontSize:11, background:'rgba(74,158,255,0.1)', color:'#4a9eff', border:'1px solid rgba(74,158,255,0.25)', padding:'2px 8px', borderRadius:999 }}>RAWG API</span>
           }
-          {totalCount>0 && <span style={{ fontSize:11, color:'#5a5f78', fontFamily:'Noto Sans KR' }}>총 {totalCount.toLocaleString()}개</span>}
-          <span style={{ marginLeft:'auto', fontSize:11, color:'#5a5f78', fontFamily:'Noto Sans KR' }}>{!loading&&`${games.length}개 로드됨`}</span>
+          {totalCount > 0 && <span style={{ fontSize:11, color:'#5a5f78', fontFamily:'Noto Sans KR' }}>총 {totalCount.toLocaleString()}개</span>}
+          <span style={{ marginLeft:'auto', fontSize:11, color: done ? '#00d68f' : '#4a9eff', fontFamily:'Noto Sans KR', fontWeight: done ? 700 : 400 }}>
+            {done
+              ? `✅ ${games.length}개 로드 완료`
+              : loading
+                ? '첫 데이터 로딩 중...'
+                : `${loadedCount}개 로딩 중...`}
+          </span>
         </div>
+
+        {/* 배치 로딩 진행 바 */}
+        {!done && !loading && loadingMore && (
+          <div style={{ marginBottom:12 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, color:'#5a5f78', fontFamily:'Noto Sans KR', marginBottom:4 }}>
+              <span>🔄 백그라운드 로딩 중 — 카테고리 지금 바로 사용 가능</span>
+              <span style={{ color:'#4a9eff', fontWeight:600 }}>{loadedCount} / 1000</span>
+            </div>
+            <div style={{ height:3, background:'rgba(255,255,255,0.06)', borderRadius:999, overflow:'hidden' }}>
+              <div style={{ height:'100%', width:`${progressPct}%`, background:'linear-gradient(90deg,#4a9eff,#7c5cfc)', borderRadius:999, transition:'width 0.4s ease' }}/>
+            </div>
+          </div>
+        )}
 
         {/* 카테고리 바 */}
         {fullPage && games.length > 0 && (
@@ -458,7 +478,7 @@ export default function GameList({ fullPage=false }) {
         {/* AI 검색바 */}
         {games.length > 0 && (
           <AISearchBar
-            games={displayAll}
+            games={pool}
             onResult={(r, q) => { setAiResults(r); setAiQuery(q); }}
             onReset={() => { setAiResults(null); setAiQuery(''); }}
           />
@@ -468,23 +488,21 @@ export default function GameList({ fullPage=false }) {
         {aiResults !== null && (
           <div style={{ marginBottom:14, padding:'10px 14px', background:'rgba(124,92,252,0.08)', border:'1px solid rgba(124,92,252,0.25)', borderRadius:8, fontSize:13, color:'#9b7ffe', fontFamily:'Noto Sans KR' }}>
             🤖 "{aiQuery}" 검색 결과: <strong>{displayGames.length}개</strong> 게임
-            {displayGames.length===0 && ' — 조건에 맞는 게임이 없습니다. 다른 키워드를 시도해보세요.'}
+            {displayGames.length === 0 && ' — 조건에 맞는 게임이 없습니다. 다른 키워드를 시도해보세요.'}
           </div>
         )}
 
         {/* 5열 그리드 */}
-        <div style={{
-          display:'grid',
-          gridTemplateColumns: fullPage ? 'repeat(5, 1fr)' : 'repeat(5, 1fr)',
-          gap:16,
-        }}>
-          {displayGames.map((game,idx) => <FlipCard key={game.id} game={game} idx={idx} />)}
-          {(loading||(loadingMore&&fullPage)) && Array.from({length:fullPage?10:5}).map((_,i)=><SkeletonCard key={`sk-${i}`}/>)}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:16 }}>
+          {displayGames.map((game, idx) => <FlipCard key={game.id} game={game} idx={idx} />)}
+          {loading && Array.from({ length: fullPage ? 10 : 5 }).map((_, i) => <SkeletonCard key={`sk-${i}`} />)}
         </div>
 
-        {fullPage && <div ref={sentinelRef} style={{height:1,marginTop:16}}/>}
-        {fullPage&&!hasMore&&!loading&&games.length>0 && <div style={{textAlign:'center',marginTop:24,fontSize:12,color:'#3a3d52',fontFamily:'Noto Sans KR'}}>— {games.length}개 게임을 모두 불러왔습니다 —</div>}
-        {fullPage&&loadingMore && <div style={{textAlign:'center',marginTop:12,fontSize:12,color:'#4a9eff'}}><span style={{display:'inline-block',animation:'spin 0.8s linear infinite'}}>⟳</span> 불러오는 중...</div>}
+        {fullPage && done && !loading && games.length > 0 && (
+          <div style={{ textAlign:'center', marginTop:24, fontSize:12, color:'#3a3d52', fontFamily:'Noto Sans KR' }}>
+            — {games.length}개 게임을 모두 불러왔습니다 —
+          </div>
+        )}
       </div>
 
       <style>{`
