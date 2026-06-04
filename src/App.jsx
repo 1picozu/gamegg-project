@@ -4,18 +4,16 @@ import GNB from './components/GNB';
 import HeroBanner from './components/HeroBanner';
 import FeedSection from './components/FeedSection';
 import GameList from './components/GameList';
-import OfflineToast from './components/OfflineToast';
 import ToastNotification from './components/ToastNotification';
 
-// Pages
 import PostDetail   from './pages/PostDetail';
 import CreatePost   from './pages/CreatePost';
 import LoginPage    from './pages/LoginPage';
 import FriendsPage  from './pages/FriendsPage';
 import ScrimPage    from './pages/ScrimPage';
 import BalancerPage from './pages/BalancerPage';
+import BoardPage    from './pages/BoardPage';
 
-// ─── 홈 화면 ────────────────────────────────────────────────────────
 function HomePage() {
   return (
     <>
@@ -26,39 +24,32 @@ function HomePage() {
   );
 }
 
-// ─── 게임 목록 전용 페이지 ──────────────────────────────────────────
 function GamesPage() {
   const { navigate } = useApp();
   return (
     <div style={{ maxWidth:1400, margin:'0 auto', padding:'28px 16px', animation:'fadeInUp 0.3s ease' }}>
       <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:20 }}>
-        <button onClick={() => navigate('home')} style={{
-          background:'none', border:'none', color:'#8a8fa8', fontSize:13,
-          cursor:'pointer', fontFamily:'Noto Sans KR', padding:0,
-        }}
-        onMouseEnter={e => e.currentTarget.style.color='#4a9eff'}
-        onMouseLeave={e => e.currentTarget.style.color='#8a8fa8'}
+        <button onClick={()=>navigate('home')} style={{ background:'none', border:'none', color:'#8a8fa8', fontSize:13, cursor:'pointer', fontFamily:'Noto Sans KR', padding:0 }}
+          onMouseEnter={e=>e.currentTarget.style.color='#4a9eff'} onMouseLeave={e=>e.currentTarget.style.color='#8a8fa8'}
         >← 메인으로</button>
         <span style={{ color:'#3a3d52' }}>/</span>
         <span className="section-title">전체 게임 목록</span>
       </div>
       <GameList fullPage />
-      <style>{`@keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }`}</style>
+      <style>{`@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
     </div>
   );
 }
 
-// ─── 라우터 ─────────────────────────────────────────────────────────
 function Router() {
   const { state } = useApp();
-  const { page } = state;
-
-  switch (page) {
+  switch (state.page) {
     case 'home':        return <HomePage />;
     case 'games':       return <GamesPage />;
     case 'friends':     return <FriendsPage />;
     case 'scrim':       return <ScrimPage />;
     case 'balancer':    return <BalancerPage />;
+    case 'board':       return <BoardPage />;
     case 'post-detail': return <PostDetail />;
     case 'create-post': return <CreatePost />;
     case 'login':       return <LoginPage />;
@@ -66,15 +57,11 @@ function Router() {
   }
 }
 
-// ─── 루트 래퍼 ──────────────────────────────────────────────────────
 function AppShell() {
   const { state } = useApp();
-  const isFullscreenPage = ['login'].includes(state.page);
+  const isFullscreen = ['login'].includes(state.page);
 
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('gamegg-theme') !== 'light';
-  });
-
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('gamegg-theme') !== 'light');
   useEffect(() => {
     document.body.classList.toggle('light', !darkMode);
     localStorage.setItem('gamegg-theme', darkMode ? 'dark' : 'light');
@@ -82,22 +69,12 @@ function AppShell() {
 
   return (
     <div style={{ minHeight:'100vh' }}>
-      <GNB darkMode={darkMode} toggleDark={() => setDarkMode(d => !d)} />
+      <GNB darkMode={darkMode} toggleDark={()=>setDarkMode(d=>!d)} />
       <ToastNotification />
-
-      {isFullscreenPage ? (
-        <Router />
-      ) : (
-        <main className="max-w-7xl mx-auto px-4 py-6">
-          <Router />
-        </main>
+      {isFullscreen ? <Router /> : (
+        <main className="max-w-7xl mx-auto px-4 py-6"><Router /></main>
       )}
-
-      <footer style={{
-        borderTop:'1px solid rgba(255,255,255,0.05)',
-        padding:'20px 24px', textAlign:'center',
-        fontSize:12, color:'#4a4d5e', fontFamily:'Noto Sans KR',
-      }}>
+      <footer style={{ borderTop:'1px solid rgba(255,255,255,0.05)', padding:'20px 24px', textAlign:'center', fontSize:12, color:'#4a4d5e', fontFamily:'Noto Sans KR' }}>
         © 2025 GAME.GG — 같이 게임하는 세상
       </footer>
     </div>
@@ -105,9 +82,5 @@ function AppShell() {
 }
 
 export default function App() {
-  return (
-    <AppProvider>
-      <AppShell />
-    </AppProvider>
-  );
+  return <AppProvider><AppShell /></AppProvider>;
 }
