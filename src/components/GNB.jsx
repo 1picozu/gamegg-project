@@ -8,7 +8,6 @@ const NAV_ITEMS = [
   { label:'게임 내전 찾기', page:'scrim' },
   { label:'게임 게시판',    page:'board' },
   { label:'밸런스 생성기',  page:'balancer' },
-  { label:'리뷰어 랭킹',     page:'reviews' },
 ];
 
 export default function GNB({ darkMode, toggleDark }) {
