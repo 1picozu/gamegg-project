@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRawgGames, searchGamesAPI } from '../hooks/useRawgGames';
 import SkeletonCard from './SkeletonCard';
 import OfflineToast from './OfflineToast';
-import GameDetailModal from './GameDetailModal';
 
 const GENRE_COLOR = {
   'Action':'#ff4757','RPG':'#7c5cfc','Shooter':'#f5a623','Strategy':'#4a9eff',
@@ -76,7 +75,7 @@ function StoreButtons({ gameName }) {
 }
 
 // ── 3D 플립 카드 ────────────────────────────────────────────────────
-function FlipCard({ game, idx, onDetail }) {
+function FlipCard({ game, idx }) {
   const [flipped, setFlipped] = useState(false);
   const color = getGenreColor(game.genres);
   const mc    = game.metacritic;
@@ -157,10 +156,6 @@ function FlipCard({ game, idx, onDetail }) {
             </div>
           </div>
           <div style={{ fontSize:10, color:'#3a3d52', textAlign:'center' }}>↩ 다시 클릭하면 앞면</div>
-          <button
-            onClick={e=>{ e.stopPropagation(); onDetail(game); }}
-            style={{ width:'100%', marginTop:4, padding:'8px', background:'linear-gradient(135deg,#7c5cfc,#4a9eff)', border:'none', borderRadius:8, color:'#fff', fontSize:11, fontWeight:700, cursor:'pointer', fontFamily:'Noto Sans KR' }}
-          >🔍 상세 정보 보기</button>
         </div>
       </div>
     </div>
@@ -290,13 +285,13 @@ function matchScore(game, answers) {
   return score;
 }
 
-function AIRecommendModal({ games, onClose, onDetail }) {
+function AIRecommendModal({ games, onClose }) {
   const [step,    setStep]    = useState(0);
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState(null);
   const [cursor,  setCursor]  = useState(0); // 현재 보여주는 게임 인덱스
   const [passedIds, setPassedIds] = useState(new Set());
-  const SHOW_COUNT = 8; // 한 번에 보여줄 게임 수
+  const SHOW_COUNT = 6; // 한 번에 보여줄 게임 수
 
   const current = SURVEY_STEPS[step];
 
@@ -432,7 +427,7 @@ function AIRecommendModal({ games, onClose, onDetail }) {
               ) : (
                 <>
                   <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(140px,1fr))', gap:14, marginBottom:20 }}>
-                    {shown.map((game, idx) => <FlipCard key={game.id} game={game} idx={idx} onDetail={onDetail}/>)}
+                    {shown.map((game, idx) => <FlipCard key={game.id} game={game} idx={idx}/>)}
                   </div>
 
                   <div style={{ display:'flex', justifyContent:'center', gap:12, alignItems:'center' }}>
@@ -465,9 +460,8 @@ export default function GameList({ fullPage=false }) {
   const [category,   setCategory]   = useState('all');
   const [search,     setSearch]     = useState('');
   const [showAI,     setShowAI]     = useState(false);
-  const [searchResults, setSearchResults] = useState(null);
+  const [searchResults, setSearchResults] = useState(null); // null=미검색, []=검색중/결과없음
   const [searchLoading, setSearchLoading] = useState(false);
-  const [selectedGame,  setSelectedGame]  = useState(null); // 상세 모달
   const searchTimer = useRef(null);
 
   const pool = fullPage ? games : games.slice(0, 10);
@@ -519,8 +513,7 @@ export default function GameList({ fullPage=false }) {
   return (
     <>
       <OfflineToast show={offline}/>
-      {showAI && <AIRecommendModal games={pool} onClose={()=>setShowAI(false)} onDetail={setSelectedGame}/>}
-      {selectedGame && <GameDetailModal game={selectedGame} onClose={()=>setSelectedGame(null)}/>}
+      {showAI && <AIRecommendModal games={pool} onClose={()=>setShowAI(false)}/>}
 
       <div className="card p-5 mb-8">
         {/* 헤더 */}
@@ -593,7 +586,7 @@ export default function GameList({ fullPage=false }) {
 
         {/* 5열 그리드 */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:16 }}>
-          {displayGames.map((game,idx)=><FlipCard key={game.id} game={game} idx={idx} onDetail={setSelectedGame}/>)}
+          {displayGames.map((game,idx)=><FlipCard key={game.id} game={game} idx={idx}/>)}
           {loading && Array.from({length:fullPage?10:5}).map((_,i)=><SkeletonCard key={`sk-${i}`}/>)}
         </div>
 
