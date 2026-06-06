@@ -6,66 +6,293 @@
 
 * { box-sizing: border-box; }
 
-/* 🌙 다크모드: 배경을 덜 까맣게, 텍스트는 더 하얗게 수정하여 가독성 업 */
+/* ══════════════════════════════════════
+   다크 모드 (기본)
+══════════════════════════════════════ */
 body {
   font-family: 'Noto Sans KR', sans-serif;
-  background-color: #15161c; 
-  color: #ffffff; 
+  background-color: #0d0f18;
+  color: #dde1f0;
   min-height: 100vh;
 }
 
-/* ☀️ 라이트모드: 눈부심 방지를 위해 배경을 살짝 톤다운, 텍스트는 찐한 검은색으로 */
+/* ══════════════════════════════════════
+   라이트 모드 — 전체 토큰 재정의
+══════════════════════════════════════ */
 body.light {
-  background-color: #f7f9fc;
-  color: #111418;
+  background-color: #e8ecf7;
+  color: #0f1220;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #1a1c23; }
-::-webkit-scrollbar-thumb { background: #4a506b; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #10121a; }
+::-webkit-scrollbar-thumb { background: #2e3248; border-radius: 3px; }
+body.light ::-webkit-scrollbar-track { background: #dde1f0; }
+body.light ::-webkit-scrollbar-thumb { background: #a0a8c8; border-radius: 3px; }
 
-/* GNB */
+/* ── GNB ───────────────────────────────────────────────────────── */
 .gnb {
-  background: rgba(21, 22, 28, 0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+  background: rgba(13, 15, 24, 0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(74,158,255,0.18);
 }
-
 body.light .gnb {
-  background: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid rgba(74, 158, 255, 0.4);
+  background: rgba(255,255,255,0.96);
+  border-bottom: 1px solid rgba(74,158,255,0.3);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
-/* Game badges */
-.badge-lol { background: #c8a84b22; color: #c8a84b; border: 1px solid #c8a84b44; }
-.badge-valorant { background: #ff4e5022; color: #ff6b6d; border: 1px solid #ff4e5044; }
-.badge-pubg { background: #f5a62322; color: #f5a623; border: 1px solid #f5a62344; }
-.badge-overwatch { background: #f9931222; color: #f99312; border: 1px solid #f9931244; }
-.badge-starcraft { background: #4a9eff22; color: #4a9eff; border: 1px solid #4a9eff44; }
-.badge-default { background: #7c5cfc22; color: #9b7ffe; border: 1px solid #7c5cfc44; }
-
-/* Tier colors */
-.tier-challenger { color: #f0c330; }
-.tier-master { color: #c45bcf; }
-.tier-diamond { color: #6badf5; }
-.tier-emerald { color: #00d68f; }
-.tier-platinum { color: #6ecbce; }
-.tier-gold { color: #e6bc6e; }
-.tier-silver { color: #a8b4c0; }
-.tier-bronze { color: #b07040; }
-
-/* 🌙 다크모드 카드 스타일: 테두리를 조금 더 뚜렷하게 */
+/* ── 카드 ──────────────────────────────────────────────────────── */
 .card {
-  background: #1c1e26;
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #151720;
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 12px;
+}
+body.light .card {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
 }
 
 .card-inner {
-  background: #232530;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #1b1e2e;
+  border: 1px solid rgba(255,255,255,0.06);
   border-radius: 8px;
 }
+body.light .card-inner {
+  background: #f2f5fc;
+  border: 1px solid rgba(0,0,0,0.07);
+}
 
-/* ☀️ 라이트모드 카드 스타일: 내부 카드 배경을 조금 더 어
+/* ── 피드 아이템 ───────────────────────────────────────────────── */
+.feed-item {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.feed-item:hover {
+  background: rgba(74,158,255,0.07);
+  border-color: rgba(74,158,255,0.22);
+  transform: translateX(2px);
+}
+body.light .feed-item { color: #1a1d2e; }
+body.light .feed-item:hover {
+  background: rgba(74,158,255,0.08);
+  border-color: rgba(74,158,255,0.25);
+}
+
+/* ── 인풋 ──────────────────────────────────────────────────────── */
+.ggg-input {
+  background: #0d0f18;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #dde1f0;
+  padding: 9px 12px;
+  font-size: 13px;
+  width: 100%;
+  transition: border-color 0.2s;
+  font-family: 'Noto Sans KR', sans-serif;
+  outline: none;
+}
+body.light .ggg-input {
+  background: #f0f3fc;
+  border-color: rgba(0,0,0,0.15);
+  color: #0f1220;
+}
+.ggg-input:focus { border-color: #4a9eff; }
+.ggg-input::placeholder { color: #505570; }
+body.light .ggg-input::placeholder { color: #8090b0; }
+
+.ggg-select {
+  background: #0d0f18;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #dde1f0;
+  padding: 9px 12px;
+  font-size: 13px;
+  width: 100%;
+  transition: border-color 0.2s;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer;
+  outline: none;
+}
+body.light .ggg-select {
+  background: #f0f3fc;
+  border-color: rgba(0,0,0,0.15);
+  color: #0f1220;
+}
+.ggg-select:focus { border-color: #4a9eff; }
+.ggg-select option { background: #1b1e2e; color: #dde1f0; }
+body.light .ggg-select option { background: #ffffff; color: #0f1220; }
+
+/* ── 버튼 ──────────────────────────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #4a9eff, #7c5cfc);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+/* ── 네비 버튼 ─────────────────────────────────────────────────── */
+.nav-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: #7a80a0;
+  transition: all 0.2s;
+  font-family: 'Noto Sans KR', sans-serif;
+  white-space: nowrap;
+}
+.nav-btn:hover, .nav-btn.active {
+  background: rgba(74,158,255,0.13);
+  color: #4a9eff;
+}
+body.light .nav-btn { color: #4a5070; }
+body.light .nav-btn:hover, body.light .nav-btn.active {
+  background: rgba(74,158,255,0.12);
+  color: #1a6fdd;
+}
+
+/* ── 섹션 타이틀 ───────────────────────────────────────────────── */
+.section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  color: #dde1f0;
+}
+body.light .section-title { color: #0f1220; }
+
+/* ── 게임 뱃지 ─────────────────────────────────────────────────── */
+.badge-lol      { background:#c8a84b22; color:#c8a84b; border:1px solid #c8a84b55; }
+.badge-valorant { background:#ff4e5022; color:#ff6060; border:1px solid #ff4e5055; }
+.badge-pubg     { background:#f5a62322; color:#f5a623; border:1px solid #f5a62355; }
+.badge-overwatch{ background:#f9931222; color:#f99312; border:1px solid #f9931255; }
+.badge-starcraft{ background:#4a9eff22; color:#4a9eff; border:1px solid #4a9eff55; }
+.badge-default  { background:#7c5cfc22; color:#9b7ffe; border:1px solid #7c5cfc55; }
+
+body.light .badge-lol      { background:#c8a84b18; color:#9a7000; border:1px solid #c8a84b55; }
+body.light .badge-valorant { background:#ff4e5018; color:#cc0010; border:1px solid #ff4e5055; }
+body.light .badge-pubg     { background:#f5a62318; color:#b07000; border:1px solid #f5a62355; }
+body.light .badge-overwatch{ background:#f9931218; color:#b06000; border:1px solid #f9931255; }
+body.light .badge-starcraft { background:#4a9eff18; color:#0055cc; border:1px solid #4a9eff55; }
+body.light .badge-default  { background:#7c5cfc18; color:#5030cc; border:1px solid #7c5cfc55; }
+
+/* ── 티어 색상 ─────────────────────────────────────────────────── */
+.tier-challenger { color: #e8b800; }
+.tier-master     { color: #c045cf; }
+.tier-diamond    { color: #4a9eff; }
+.tier-emerald    { color: #00c870; }
+.tier-platinum   { color: #50bcc0; }
+.tier-gold       { color: #d4a030; }
+.tier-silver     { color: #8898a8; }
+.tier-bronze     { color: #a06030; }
+
+body.light .tier-challenger { color: #a07000; }
+body.light .tier-master     { color: #8800aa; }
+body.light .tier-diamond    { color: #1155cc; }
+body.light .tier-emerald    { color: #007040; }
+body.light .tier-platinum   { color: #1480a0; }
+body.light .tier-gold       { color: #906000; }
+body.light .tier-silver     { color: #405060; }
+body.light .tier-bronze     { color: #703010; }
+
+/* ── 게임 카드 ─────────────────────────────────────────────────── */
+.game-card {
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.game-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+body.light .game-card { border-color: rgba(0,0,0,0.08); }
+
+/* ── 팀 카드 ───────────────────────────────────────────────────── */
+.team-card { border-radius: 12px; padding: 16px; animation: fadeInUp 0.4s ease forwards; }
+.team-a {
+  background: linear-gradient(135deg, rgba(74,158,255,0.12), rgba(74,158,255,0.04));
+  border: 1px solid rgba(74,158,255,0.3);
+}
+.team-b {
+  background: linear-gradient(135deg, rgba(255,71,87,0.12), rgba(255,71,87,0.04));
+  border: 1px solid rgba(255,71,87,0.3);
+}
+body.light .team-a {
+  background: linear-gradient(135deg, rgba(74,158,255,0.1), rgba(74,158,255,0.03));
+  border-color: rgba(74,158,255,0.35);
+}
+body.light .team-b {
+  background: linear-gradient(135deg, rgba(255,71,87,0.1), rgba(255,71,87,0.03));
+  border-color: rgba(255,71,87,0.35);
+}
+
+/* ── 라이브 도트 ───────────────────────────────────────────────── */
+.live-dot {
+  width: 8px; height: 8px;
+  background: #00d68f;
+  border-radius: 50%;
+  animation: pulseGlow 1.5s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* ── VS 뱃지 ───────────────────────────────────────────────────── */
+.vs-badge {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #8a8fa8;
+}
+body.light .vs-badge {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.12);
+  color: #4a5070;
+}
+
+/* ── 라이트 모드 공통 텍스트 ──────────────────────────────────── */
+body.light { color: #1a1d2e; }
+
+/* 부제, 설명 텍스트가 너무 연한 경우 대비 */
+body.light span, body.light div, body.light p, body.light label {
+  /* 인라인 스타일이 없는 경우만 적용 */
+}
+
+/* 모달/드롭다운 배경 */
+body.light .dropdown-menu {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.12);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* ── 애니메이션 ─────────────────────────────────────────────────── */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,214,143,0.4); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(0,214,143,0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
