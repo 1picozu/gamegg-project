@@ -14,7 +14,6 @@ import ScrimPage    from './pages/ScrimPage';
 import BalancerPage from './pages/BalancerPage';
 import BoardPage    from './pages/BoardPage';
 import MyPage       from './pages/MyPage';
-import ReviewPage   from './pages/ReviewPage';
 
 function HomePage() {
   return (
@@ -56,7 +55,6 @@ function Router() {
     case 'create-post': return <CreatePost />;
     case 'login':       return <LoginPage />;
     case 'mypage':      return <MyPage />;
-    case 'reviews':     return <ReviewPage />;
     default:            return <HomePage />;
   }
 }
