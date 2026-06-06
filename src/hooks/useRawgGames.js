@@ -49,7 +49,10 @@ function normalizeFallback(m) {
 }
 
 async function fetchPage(pageNum, extraParams='') {
-  const url = `${BASE_URL}/games?key=${RAWG_API_KEY}&ordering=-released&page=${pageNum}&page_size=${PAGE_SIZE}&exclude_additions=true${extraParams}`;
+  const today = new Date();
+  const toDate = today.toISOString().slice(0,10);
+  const fromDate = new Date(today.getFullYear()-1, today.getMonth(), today.getDate()).toISOString().slice(0,10);
+  const url = `${BASE_URL}/games?key=${RAWG_API_KEY}&ordering=-released&dates=${fromDate},${toDate}&page=${pageNum}&page_size=${PAGE_SIZE}&exclude_additions=true${extraParams}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
@@ -64,7 +67,10 @@ async function fetchPage(pageNum, extraParams='') {
 export async function searchGamesAPI(query) {
   if (!RAWG_API_KEY || !query.trim()) return [];
   try {
-    const url = `${BASE_URL}/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(query)}&page_size=40&ordering=-released&exclude_additions=true`;
+    const today = new Date();
+    const toDate = today.toISOString().slice(0,10);
+    const fromDate = new Date(today.getFullYear()-3, today.getMonth(), today.getDate()).toISOString().slice(0,10);
+    const url = `${BASE_URL}/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(query)}&page_size=40&ordering=-released&dates=${fromDate},${toDate}&exclude_additions=true`;
     const res = await fetch(url);
     if (!res.ok) return [];
     const data = await res.json();
@@ -166,3 +172,16 @@ export function useRawgGames() {
 
   return { games, loading, loadingMore, offline, hasMore:false, loadMore:()=>{}, totalCount, loadedCount, done };
 }
+
+// ── FeaturedGames 용 하드코딩 데이터 ─────────────────────────────
+// 메인화면 인기 게임 섹션에서 사용 (API 로딩 전에도 즉시 표시)
+export const FEATURED_GAMES = [
+  { id:3498,  name:'Grand Theft Auto V',          img:'https://media.rawg.io/media/games/20a/20aa03a10cda45239fe22d035c0ebe64.jpg', metacritic:92, rating:4.47, released:'2013-09-17', genres:['Action'],          color:'#f5a623' },
+  { id:3328,  name:'The Witcher 3: Wild Hunt',     img:'https://media.rawg.io/media/games/618/618c2031a07bbff6b4f611f10b6bcdbc.jpg', metacritic:92, rating:4.64, released:'2015-05-18', genres:['RPG','Action'],     color:'#7c5cfc' },
+  { id:4200,  name:'Portal 2',                     img:'https://media.rawg.io/media/games/2ba/2bac0e87cf45e5b508f227d281c9252a.jpg', metacritic:95, rating:4.58, released:'2011-04-18', genres:['Shooter','Puzzle'], color:'#4a9eff' },
+  { id:4291,  name:'Counter-Strike: Global Offensive', img:'https://media.rawg.io/media/games/736/73619bd336c894d6941d926bfd563946.jpg', metacritic:81, rating:3.57, released:'2012-08-21', genres:['Shooter'],      color:'#f5a623' },
+  { id:13536, name:'Elden Ring',                   img:'https://media.rawg.io/media/games/b29/b294fdd866dcdb643e7bab370a552855.jpg', metacritic:96, rating:4.67, released:'2022-02-25', genres:['Action','RPG'],     color:'#c8a84b' },
+  { id:41494, name:'Hades',                        img:'https://media.rawg.io/media/games/1f4/1f47a270b8f241f1847b5927a92dd2df.jpg', metacritic:93, rating:4.53, released:'2020-09-17', genres:['Action','Indie'],   color:'#ff4757' },
+  { id:58175, name:'God of War',                   img:'https://media.rawg.io/media/games/4be/4be6a6ad0364751a96229c56bf69be73.jpg', metacritic:94, rating:4.63, released:'2018-04-20', genres:['Action','Adventure'],color:'#4a9eff' },
+  { id:28,    name:'Red Dead Redemption 2',        img:'https://media.rawg.io/media/games/511/5118aff5091cb3efec399c808f8c598f.jpg', metacritic:97, rating:4.66, released:'2019-11-05', genres:['Action','Adventure'],color:'#c8a84b' },
+];

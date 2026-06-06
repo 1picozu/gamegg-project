@@ -1,34 +1,32 @@
 import { useState } from 'react';
 import { useApp } from '../store/AppContext';
 
-const GAMES = ['리그오브레전드','발로란트','PUBG','오버워치 2','스타크래프트 2','디아블로 4','배틀그라운드','로스트아크'];
-const TIERS = ['챌린저','마스터','다이아','에메랄드','플래티넘','골드','실버','브론즈'];
-const TIMES = ['지금 바로','30분 후','1시간 후','오늘 저녁 7시','오늘 저녁 8시','오늘 저녁 9시','오늘 저녁 10시','오늘 밤 11시','내일 오전'];
+const GAMES = ['리그오브레전드','발로란트','PUBG','오버워치 2','스타크래프트 2','디아블로 4','배틀그라운드','로스트아크','직접 입력'];
+const TIERS = ['챌린저','마스터','다이아','에메랄드','플래티넘','골드','실버','브론즈','무관'];
 
 export default function CreatePost() {
   const { state, navigate, addFriendsPost, addScrimPost } = useApp();
   const { pageParams, user } = state;
-  const mode = pageParams.mode || 'friends'; // 'friends' | 'scrim'
+  const mode = pageParams.mode || 'friends';
   const isFriends = mode === 'friends';
+  const accentColor = isFriends ? '#4a9eff' : '#ff4757';
 
   const [form, setForm] = useState({
-    game: '리그오브레전드',
-    title: '',
-    time: '지금 바로',
+    game: '리그오브레전드', customGame: '',
+    title: '', time: '', customTime: '',
     maxSlots: isFriends ? 4 : 10,
-    tier: '골드',
-    tag: '',
-    desc: '',
+    tier: '골드', customTier: '',
+    tag: '', desc: '',
   });
-  const [errors, setErrors] = useState({});
+  const [errors,    setErrors]    = useState({});
   const [submitted, setSubmitted] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const validate = () => {
     const e = {};
-    if (!form.title.trim()) e.title = '방 제목을 입력해주세요.';
-    if (form.title.trim().length < 5) e.title = '제목은 5자 이상 입력해주세요.';
+    if (!form.title.trim())            e.title = '방 제목을 입력해주세요.';
+    if (form.title.trim().length < 2)  e.title = '제목은 2자 이상 입력해주세요.';
     return e;
   };
 
@@ -37,12 +35,16 @@ export default function CreatePost() {
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
 
+    const finalGame = form.game === '직접 입력' ? (form.customGame.trim() || '기타') : form.game;
+    const finalTime = form.time === '직접 입력' ? (form.customTime.trim() || '협의') : (form.time || '협의');
+    const finalTier = form.tier === '무관' ? '무관' : form.tier;
+
     const post = {
-      game:   form.game,
+      game:   finalGame,
       title:  form.title.trim(),
-      time:   form.time,
+      time:   finalTime,
       slots:  `1/${form.maxSlots}`,
-      tier:   form.tier,
+      tier:   finalTier,
       tag:    form.tag.trim() || null,
       desc:   form.desc.trim(),
       author: user.nickname,
@@ -52,185 +54,133 @@ export default function CreatePost() {
     else           addScrimPost(post);
 
     setSubmitted(true);
-    setTimeout(() => navigate(isFriends ? 'friends' : 'scrim'), 1200);
+    setTimeout(() => navigate(isFriends ? 'friends' : 'scrim'), 1400);
   };
 
-  const Label = ({ children, htmlFor }) => (
-    <label htmlFor={htmlFor} style={{ fontSize:12, color:'#8a8fa8', marginBottom:5, display:'block', fontFamily:'Noto Sans KR' }}>
-      {children}
-    </label>
-  );
-
-  const inputStyle = {
-    width:'100%', background:'rgba(255,255,255,0.04)',
-    border:'1px solid rgba(255,255,255,0.1)', borderRadius:8,
-    color:'#e2e4ed', padding:'10px 12px', fontSize:13,
-    fontFamily:'Noto Sans KR', transition:'border-color 0.2s', outline:'none',
-    boxSizing:'border-box',
+  const iS = {
+    width:'100%', background:'rgba(255,255,255,0.05)',
+    border:'1px solid rgba(255,255,255,0.12)', borderRadius:8,
+    color:'#f0f2ff', padding:'10px 13px', fontSize:13, fontWeight:500,
+    fontFamily:'Noto Sans KR', transition:'border-color 0.2s', outline:'none', boxSizing:'border-box',
   };
+  const fi = e => e.currentTarget.style.borderColor = accentColor;
+  const fo = e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
 
-  const accentColor = isFriends ? '#4a9eff' : '#ff4757';
+  const TIME_PRESETS = ['지금 바로','30분 후','1시간 후','오늘 저녁 7시','오늘 저녁 8시','오늘 저녁 9시','오늘 밤 10시','오늘 밤 11시','내일 오전','직접 입력'];
 
   return (
     <div style={{ maxWidth:640, margin:'0 auto', padding:'32px 16px', animation:'fadeInUp 0.3s ease' }}>
-      <button
-        onClick={() => navigate(isFriends ? 'friends' : 'scrim')}
-        style={{
-          display:'flex', alignItems:'center', gap:6, background:'transparent', border:'none',
-          color:'#8a8fa8', fontSize:13, cursor:'pointer', marginBottom:20, fontFamily:'Noto Sans KR', padding:0,
-        }}
-        onMouseEnter={e => e.currentTarget.style.color=accentColor}
-        onMouseLeave={e => e.currentTarget.style.color='#8a8fa8'}
+      <button onClick={()=>navigate(isFriends?'friends':'scrim')} style={{ display:'flex', alignItems:'center', gap:6, background:'transparent', border:'none', color:'#8a8fa8', fontSize:13, cursor:'pointer', marginBottom:20, fontFamily:'Noto Sans KR', fontWeight:600, padding:0 }}
+        onMouseEnter={e=>e.currentTarget.style.color=accentColor} onMouseLeave={e=>e.currentTarget.style.color='#8a8fa8'}
       >← {isFriends ? '게임친구 찾기' : '게임 내전 찾기'}로 돌아가기</button>
 
-      {/* 성공 메시지 */}
-      {submitted && (
-        <div style={{
-          textAlign:'center', padding:'40px 20px',
-          background:'rgba(0,214,143,0.08)', border:'1px solid rgba(0,214,143,0.3)',
-          borderRadius:14, marginBottom:20,
-          animation:'fadeInUp 0.4s ease',
-        }}>
-          <div style={{ fontSize:40, marginBottom:12 }}>🎉</div>
-          <div style={{ fontFamily:'Noto Sans KR', fontWeight:700, fontSize:18, color:'#00d68f', marginBottom:6 }}>
-            {isFriends ? '파티' : '내전 방'}이 생성되었습니다!
-          </div>
-          <div style={{ fontSize:13, color:'#8a8fa8' }}>잠시 후 목록으로 이동합니다...</div>
+      {submitted ? (
+        <div style={{ textAlign:'center', padding:'50px 20px', background:`${accentColor}11`, border:`1px solid ${accentColor}44`, borderRadius:16, animation:'fadeInUp 0.4s ease' }}>
+          <div style={{ fontSize:44, marginBottom:14 }}>🎉</div>
+          <div style={{ fontFamily:'Noto Sans KR', fontWeight:800, fontSize:20, color: accentColor, marginBottom:8 }}>{isFriends ? '파티' : '내전 방'} 생성 완료!</div>
+          <div style={{ fontSize:13, color:'#8a8fa8', fontFamily:'Noto Sans KR' }}>잠시 후 목록으로 이동합니다...</div>
         </div>
-      )}
-
-      {!submitted && (
+      ) : (
         <div className="card p-6">
-          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:24 }}>
-            <div style={{
-              width:36, height:36, borderRadius:8, fontSize:18,
-              background:`${accentColor}22`, border:`1px solid ${accentColor}44`,
-              display:'flex', alignItems:'center', justifyContent:'center',
-            }}>{isFriends ? '🎮' : '⚔️'}</div>
+          {/* 헤더 */}
+          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
+            <div style={{ width:38, height:38, borderRadius:10, fontSize:20, background:`${accentColor}22`, border:`1px solid ${accentColor}44`, display:'flex', alignItems:'center', justifyContent:'center' }}>{isFriends?'🎮':'⚔️'}</div>
             <div>
-              <div className="section-title">{isFriends ? '새 파티 만들기' : '내전 방 만들기'}</div>
-              <div style={{ fontSize:12, color:'#8a8fa8', marginTop:2 }}>
-                {isFriends ? '같이 게임할 파티원을 모집해보세요' : '5대5 내전 참가자를 모집해보세요'}
-              </div>
+              <div className="section-title" style={{ fontSize:17 }}>{isFriends ? '새 파티 만들기' : '내전 방 만들기'}</div>
+              <div style={{ fontSize:12, color:'#8a8fa8', marginTop:2, fontFamily:'Noto Sans KR' }}>{isFriends ? '같이 게임할 파티원을 모집하세요' : '5대5 내전 참가자를 모집하세요'}</div>
             </div>
           </div>
 
           {!user && (
-            <div style={{
-              padding:'12px 16px', background:'rgba(255,166,35,0.08)',
-              border:'1px solid rgba(255,166,35,0.3)', borderRadius:8, marginBottom:20,
-              fontSize:13, color:'#f5a623', fontFamily:'Noto Sans KR',
-            }}>
+            <div style={{ padding:'12px 14px', background:'rgba(245,166,35,0.08)', border:'1px solid rgba(245,166,35,0.3)', borderRadius:8, marginBottom:18, fontSize:13, color:'#f5a623', fontFamily:'Noto Sans KR', fontWeight:600 }}>
               ⚠️ 로그인 후 글을 작성할 수 있습니다.{' '}
-              <button onClick={() => navigate('login')} style={{ color:'#4a9eff', background:'none', border:'none', cursor:'pointer', fontFamily:'Noto Sans KR', fontSize:13 }}>
-                로그인하기 →
-              </button>
+              <button onClick={()=>navigate('login')} style={{ color:'#4a9eff', background:'none', border:'none', cursor:'pointer', fontFamily:'Noto Sans KR', fontSize:13, fontWeight:700 }}>로그인 →</button>
             </div>
           )}
 
           <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
             {/* 게임 선택 */}
             <div>
-              <Label>게임 *</Label>
-              <select
-                className="ggg-select"
-                value={form.game}
-                onChange={e => set('game', e.target.value)}
-                style={{ ...inputStyle }}
-              >
-                {GAMES.map(g => <option key={g}>{g}</option>)}
+              <div style={{ fontSize:12, color:'#b0b8d0', marginBottom:6, fontFamily:'Noto Sans KR', fontWeight:700 }}>게임 *</div>
+              <select className="ggg-select" value={form.game} onChange={e=>set('game',e.target.value)} style={iS}>
+                {GAMES.map(g=><option key={g}>{g}</option>)}
               </select>
+              {form.game==='직접 입력' && (
+                <input value={form.customGame} onChange={e=>set('customGame',e.target.value)} placeholder="게임 이름을 직접 입력하세요" style={{ ...iS, marginTop:8 }} onFocus={fi} onBlur={fo}/>
+              )}
             </div>
 
             {/* 방 제목 */}
             <div>
-              <Label>방 제목 *</Label>
-              <input
-                className="ggg-input"
-                value={form.title}
-                onChange={e => { set('title', e.target.value); setErrors({}); }}
-                placeholder={isFriends ? '예) 실버 이상 솔랭 같이 하실 분~' : '예) 에메랄드+ 5대5 내전 참가자 모집'}
-                style={{ ...inputStyle, borderColor: errors.title ? '#ff4757' : undefined }}
-              />
-              {errors.title && <div style={{ fontSize:11, color:'#ff4757', marginTop:4 }}>{errors.title}</div>}
+              <div style={{ fontSize:12, color:'#b0b8d0', marginBottom:6, fontFamily:'Noto Sans KR', fontWeight:700 }}>방 제목 *</div>
+              <input value={form.title} onChange={e=>{set('title',e.target.value);setErrors({});}}
+                placeholder={isFriends ? '예) 골드 이상 솔랭 같이 하실 분~' : '예) 에메랄드+ 5대5 내전 모집'}
+                style={{ ...iS, borderColor: errors.title ? '#ff4757' : 'rgba(255,255,255,0.12)' }}
+                onFocus={fi} onBlur={fo}/>
+              {errors.title && <div style={{ fontSize:11, color:'#ff4757', marginTop:4, fontFamily:'Noto Sans KR', fontWeight:600 }}>⚠ {errors.title}</div>}
             </div>
 
-            {/* 2열 */}
+            {/* 2열 그리드 */}
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              {/* 플레이 시간 */}
               <div>
-                <Label>플레이 시간</Label>
-                <select className="ggg-select" value={form.time} onChange={e => set('time', e.target.value)} style={inputStyle}>
-                  {TIMES.map(t => <option key={t}>{t}</option>)}
+                <div style={{ fontSize:12, color:'#b0b8d0', marginBottom:6, fontFamily:'Noto Sans KR', fontWeight:700 }}>플레이 시간 *</div>
+                <select value={form.time} onChange={e=>set('time',e.target.value)} style={{ ...iS, cursor:'pointer' }} onFocus={fi} onBlur={fo}>
+                  <option value="">선택하세요</option>
+                  {TIME_PRESETS.map(t=><option key={t}>{t}</option>)}
                 </select>
+                {form.time==='직접 입력' && (
+                  <input value={form.customTime} onChange={e=>set('customTime',e.target.value)} placeholder="예) 토요일 오후 3시" style={{ ...iS, marginTop:8 }} onFocus={fi} onBlur={fo}/>
+                )}
               </div>
+
+              {/* 최대 인원 */}
               <div>
-                <Label>최대 인원 ({form.maxSlots}명)</Label>
-                <input
-                  type="range"
-                  min={isFriends ? 2 : 4}
-                  max={isFriends ? 6 : 10}
-                  step={isFriends ? 1 : 2}
-                  value={form.maxSlots}
-                  onChange={e => set('maxSlots', Number(e.target.value))}
-                  style={{ width:'100%', accentColor }}
-                />
-                <div style={{ display:'flex', justifyContent:'space-between', fontSize:10, color:'#5a5f78' }}>
-                  <span>{isFriends ? '2명' : '4명'}</span><span>{isFriends ? '6명' : '10명'}</span>
+                <div style={{ fontSize:12, color:'#b0b8d0', marginBottom:6, fontFamily:'Noto Sans KR', fontWeight:700 }}>최대 인원 ({form.maxSlots}명)</div>
+                <input type="range" min={isFriends?2:4} max={isFriends?8:10} step={isFriends?1:2} value={form.maxSlots}
+                  onChange={e=>set('maxSlots',Number(e.target.value))}
+                  style={{ width:'100%', marginTop:8, accentColor }}/>
+                <div style={{ display:'flex', justifyContent:'space-between', fontSize:10, color:'#7a8098', marginTop:2, fontFamily:'Noto Sans KR' }}>
+                  <span>{isFriends?'2명':'4명'}</span><span>{isFriends?'8명':'10명'}</span>
                 </div>
               </div>
-            </div>
 
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              {/* 최소 티어 */}
               <div>
-                <Label>최소 티어</Label>
-                <select className="ggg-select" value={form.tier} onChange={e => set('tier', e.target.value)} style={inputStyle}>
-                  {TIERS.map(t => <option key={t}>{t}</option>)}
+                <div style={{ fontSize:12, color:'#b0b8d0', marginBottom:6, fontFamily:'Noto Sans KR', fontWeight:700 }}>최소 티어</div>
+                <select value={form.tier} onChange={e=>set('tier',e.target.value)} style={{ ...iS, cursor:'pointer' }} onFocus={fi} onBlur={fo}>
+                  {TIERS.map(t=><option key={t}>{t}</option>)}
                 </select>
               </div>
+
+              {/* 태그 */}
               <div>
-                <Label>태그 (선택)</Label>
-                <input
-                  className="ggg-input"
-                  value={form.tag}
-                  onChange={e => set('tag', e.target.value)}
-                  placeholder="예) 마이크 필수, 즐겜"
-                  style={inputStyle}
-                  maxLength={15}
-                />
+                <div style={{ fontSize:12, color:'#b0b8d0', marginBottom:6, fontFamily:'Noto Sans KR', fontWeight:700 }}>태그 (선택)</div>
+                <input value={form.tag} onChange={e=>set('tag',e.target.value)} placeholder="예) 마이크 필수, 즐겜" style={iS} onFocus={fi} onBlur={fo} maxLength={15}/>
               </div>
             </div>
 
             {/* 상세 설명 */}
             <div>
-              <Label>상세 설명 (선택)</Label>
-              <textarea
-                value={form.desc}
-                onChange={e => set('desc', e.target.value)}
-                placeholder="추가로 전달할 내용을 자유롭게 작성해주세요."
-                rows={3}
-                style={{ ...inputStyle, resize:'vertical', lineHeight:1.6 }}
-              />
+              <div style={{ fontSize:12, color:'#b0b8d0', marginBottom:6, fontFamily:'Noto Sans KR', fontWeight:700 }}>상세 설명 (선택)</div>
+              <textarea value={form.desc} onChange={e=>set('desc',e.target.value)}
+                placeholder="추가로 전달할 내용을 자유롭게 적어주세요." rows={3}
+                style={{ ...iS, resize:'vertical', lineHeight:1.7 }} onFocus={fi} onBlur={fo}/>
             </div>
 
-            <button
-              onClick={handleSubmit}
-              style={{
-                width:'100%', padding:'13px',
-                background:`linear-gradient(135deg, ${accentColor}, ${isFriends ? '#7c5cfc' : '#ff6b35'})`,
-                border:'none', borderRadius:10, color:'#fff',
-                fontSize:15, fontWeight:700, cursor:'pointer', fontFamily:'Noto Sans KR',
-                transition:'opacity 0.2s',
-              }}
-              onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
-              onMouseLeave={e => e.currentTarget.style.opacity='1'}
-            >
-              {isFriends ? '🎮 파티 만들기' : '⚔️ 내전 방 만들기'}
-            </button>
+            <button onClick={handleSubmit} style={{
+              width:'100%', padding:'13px',
+              background:`linear-gradient(135deg,${accentColor},${isFriends?'#7c5cfc':'#ff6b35'})`,
+              border:'none', borderRadius:10, color:'#fff',
+              fontSize:15, fontWeight:800, cursor:'pointer', fontFamily:'Noto Sans KR', transition:'opacity 0.2s',
+            }}
+            onMouseEnter={e=>e.currentTarget.style.opacity='0.88'}
+            onMouseLeave={e=>e.currentTarget.style.opacity='1'}
+            >{isFriends ? '🎮 파티 만들기' : '⚔️ 내전 방 만들기'}</button>
           </div>
         </div>
       )}
-
-      <style>{`@keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }`}</style>
+      <style>{`@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
     </div>
   );
 }

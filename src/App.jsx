@@ -3,23 +3,27 @@ import { AppProvider, useApp } from './store/AppContext';
 import GNB from './components/GNB';
 import HeroBanner from './components/HeroBanner';
 import FeedSection from './components/FeedSection';
+import FeaturedGames from './components/FeaturedGames';
 import GameList from './components/GameList';
 import ToastNotification from './components/ToastNotification';
 
-import PostDetail   from './pages/PostDetail';
-import CreatePost   from './pages/CreatePost';
-import LoginPage    from './pages/LoginPage';
-import FriendsPage  from './pages/FriendsPage';
-import ScrimPage    from './pages/ScrimPage';
-import BalancerPage from './pages/BalancerPage';
-import BoardPage    from './pages/BoardPage';
-import MyPage       from './pages/MyPage';
+import PostDetail    from './pages/PostDetail';
+import CreatePost    from './pages/CreatePost';
+import LoginPage     from './pages/LoginPage';
+import FriendsPage   from './pages/FriendsPage';
+import ScrimPage     from './pages/ScrimPage';
+import BalancerPage  from './pages/BalancerPage';
+import BoardPage     from './pages/BoardPage';
+import MyPage        from './pages/MyPage';
+import GameInfoPage  from './pages/GameInfoPage';
+import TrackerPage   from './pages/TrackerPage';
 
 function HomePage() {
   return (
     <>
       <HeroBanner />
       <FeedSection compact={true} />
+      <FeaturedGames />
       <GameList />
     </>
   );
@@ -51,6 +55,8 @@ function Router() {
     case 'scrim':       return <ScrimPage />;
     case 'balancer':    return <BalancerPage />;
     case 'board':       return <BoardPage />;
+    case 'gameinfo':    return <GameInfoPage />;
+    case 'tracker':     return <TrackerPage />;
     case 'post-detail': return <PostDetail />;
     case 'create-post': return <CreatePost />;
     case 'login':       return <LoginPage />;
@@ -62,7 +68,6 @@ function Router() {
 function AppShell() {
   const { state } = useApp();
   const isFullscreen = ['login'].includes(state.page);
-
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('gamegg-theme') !== 'light');
   useEffect(() => {
     document.body.classList.toggle('light', !darkMode);
@@ -76,8 +81,8 @@ function AppShell() {
       {isFullscreen ? <Router /> : (
         <main className="max-w-7xl mx-auto px-4 py-6"><Router /></main>
       )}
-      <footer style={{ borderTop:'1px solid rgba(255,255,255,0.05)', padding:'20px 24px', textAlign:'center', fontSize:12, color:'#4a4d5e', fontFamily:'Noto Sans KR' }}>
-        © 2025 GAME.GG — 같이 게임하는 세상
+      <footer style={{ borderTop:'1px solid rgba(255,255,255,0.07)', padding:'20px 24px', textAlign:'center', fontSize:12, color:'#5a5f78', fontFamily:'Noto Sans KR' }}>
+        © 2025 GAME.GG — 게이머를 위한 게임 정보 허브
       </footer>
     </div>
   );
